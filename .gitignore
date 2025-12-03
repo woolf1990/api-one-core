@@ -1,0 +1,65 @@
+# Excluir archivo .eve
+.eve
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.snakevenv/
+snakevenv/
+
+# Archivos de Python compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de configuración locales
+*.env
+*.env.*
+.envrc
+.settings/
+
+# Config VS Code
+.vscode/
+
+# Carpeta de logs
+logs/
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*~
+
+# Directorios temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Salidas de paquetes Python
+build/
+dist/
+*.egg-info/
+
+# Cache de pip
+pip-wheel-metadata/
+.wheels/
+
+# Uvicorn reload cache
+.reload/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache/
+.pytest_cache/
+
+# Archivos de test
+.tox/
+.nox/
+
+# Modelos y archivos grandes opcionales
+models/
+data/
