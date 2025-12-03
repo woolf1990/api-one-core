@@ -1,7 +1,11 @@
 fastapi
 uvicorn[standard]
 python-jose[cryptography]
-passlib[bcrypt]
+
+# Fijamos versiones compatibles para evitar el error de bcrypt/passlib
+passlib[bcrypt]==1.7.4
+bcrypt==3.2.2
+
 boto3
 sqlalchemy
 pydantic

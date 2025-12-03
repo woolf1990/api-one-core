@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import auth, files, token
-from app.db import base  # ensures models are created
+from app.db.base import init_db
+from app.db.base_class import engine
+from app.services.auth_service import ensure_demo_user
 
 app = FastAPI(title="FastAPI Test Project")
 
@@ -13,9 +15,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.on_event("startup")
+def on_startup():
+    """
+    Inicializa la base de datos y crea usuarios demo al arrancar la app.
+    Evitamos efectos secundarios al importar módulos.
+    """
+    init_db(engine)
+    ensure_demo_user()
+
+
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
 app.include_router(token.router, prefix="/api/v1/token", tags=["Token"])
+
 
 @app.get("/health")
 def health():
