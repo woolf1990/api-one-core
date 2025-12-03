@@ -11,3 +11,5 @@ sqlalchemy
 pydantic
 pytest
 python-multipart
+google-generativeai
+pillow

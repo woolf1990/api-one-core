@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     AWS_REGION: str | None = None
     AWS_S3_BUCKET: str | None = None
 
+    # Gemini AI Configuration
+    GEMINI_API_KEY: str | None = None 
+
     class Config:
         env_file = ".env"
 
