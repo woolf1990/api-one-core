@@ -59,6 +59,7 @@ async def analyze_and_store_document(
             analysis_payload = None
 
         # 4) Guardar análisis estructurado si lo hay
+        analysis_id = None
         if analysis_payload:
             products = analysis_payload.get("products") or []
             products_json = json.dumps(products, ensure_ascii=False)
@@ -79,11 +80,14 @@ async def analyze_and_store_document(
                 sentiment=analysis_payload.get("sentiment"),
             )
             db.add(analysis)
+            db.flush()  # Para obtener el ID sin hacer commit
+            analysis_id = analysis.id
 
         db.commit()
 
         return {
             "document_id": doc.id,
+            "analysis_id": analysis_id,  # ID del análisis para poder modificarlo después
             "storage_path": doc.storage_path,
             "ai_status": doc.ai_status,
             "ai_error": doc.ai_error,

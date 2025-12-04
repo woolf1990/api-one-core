@@ -1,8 +1,11 @@
-from fastapi import APIRouter, File, UploadFile, Form, Depends, HTTPException, status
+from fastapi import APIRouter, File, UploadFile, Form, Depends, HTTPException, status, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from app.core.security import verify_token, TokenError
 from app.services.file_service import handle_upload
 from app.services.document_service import analyze_and_store_document
+from app.services.document_update_service import update_document_analysis, get_document_analysis
 from app.services.audit_service import log_event, EventType
 
 router = APIRouter()
@@ -118,3 +121,99 @@ async def upload_file(
         )
     
     return result
+
+
+class DocumentAnalysisUpdate(BaseModel):
+    """Modelo para actualizar análisis de documento."""
+    classification: Optional[str] = None
+    client_name: Optional[str] = None
+    client_address: Optional[str] = None
+    provider_name: Optional[str] = None
+    provider_address: Optional[str] = None
+    invoice_number: Optional[str] = None
+    invoice_date: Optional[str] = None
+    total_amount: Optional[float] = None
+    products: Optional[List[Dict[str, Any]]] = None
+    description: Optional[str] = None
+    summary: Optional[str] = None
+    sentiment: Optional[str] = None
+
+
+@router.get("/analysis/{analysis_id}")
+def get_analysis(
+    analysis_id: int,
+    creds: HTTPAuthorizationCredentials = Depends(security),
+):
+    """
+    Obtiene un análisis de documento por su ID.
+    Requiere autenticación JWT.
+    """
+    payload = require_role(creds.credentials, "uploader")
+    
+    try:
+        analysis = get_document_analysis(analysis_id)
+        if not analysis:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Análisis con ID {analysis_id} no encontrado"
+            )
+        return analysis
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener análisis: {str(e)}"
+        )
+
+
+@router.put("/analysis/{analysis_id}")
+def update_analysis(
+    analysis_id: int,
+    update_data: DocumentAnalysisUpdate = Body(...),
+    creds: HTTPAuthorizationCredentials = Depends(security),
+):
+    """
+    Actualiza un análisis de documento existente.
+    Requiere autenticación JWT y rol 'uploader'.
+    
+    Solo se actualizan los campos que se envían en el body.
+    Los campos no enviados se mantienen sin cambios.
+    """
+    payload = require_role(creds.credentials, "uploader")
+    user_id = payload.get("sub")
+    
+    try:
+        # Convertir el modelo Pydantic a dict y filtrar None
+        update_dict = update_data.model_dump(exclude_unset=True)
+        
+        # Actualizar el análisis
+        updated_analysis = update_document_analysis(
+            analysis_id=analysis_id,
+            **update_dict
+        )
+        
+        # Registrar evento de auditoría
+        log_event(
+            event_type=EventType.USER_INTERACTION,
+            description=f"Análisis de documento actualizado: ID {analysis_id}",
+            user_id=user_id,
+            metadata={
+                "analysis_id": analysis_id,
+                "document_id": updated_analysis.get("document_id"),
+                "updated_fields": list(update_dict.keys())
+            }
+        )
+        
+        return updated_analysis
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al actualizar análisis: {str(e)}"
+        )
