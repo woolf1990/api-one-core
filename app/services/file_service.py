@@ -8,7 +8,13 @@ from app.models.file_validation import FileValidation
 from app.models.data_row import DataRow
 
 def _is_empty_value(value):
-    """Verifica si un valor está vacío (None, NaN, string vacío)."""
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Verifica si un valor está vacío (None, NaN, string vacío)
+    Parámetros de entrada:
+        - value: Any - Valor a verificar (puede ser None, float, str, etc.)
+    Retorno esperado: bool - True si el valor está vacío, False en caso contrario
+    """
     if value is None:
         return True
     if isinstance(value, float):
@@ -24,10 +30,12 @@ def _is_empty_value(value):
 
 def _validate_row_basic(row, row_num):
     """
-    Valida una fila del archivo (validaciones básicas sin duplicados).
-    - name: requerido
-    - price: requerido y debe ser numérico
-    Retorna: (errors, name_normalized) donde name_normalized es el nombre normalizado si es válido, None si no
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Valida una fila del archivo (validaciones básicas sin duplicados). Valida que 'name' esté presente y que 'price' sea numérico
+    Parámetros de entrada:
+        - row: dict - Diccionario con los datos de la fila (debe contener 'name' y 'price')
+        - row_num: int - Número de fila para reportar errores
+    Retorno esperado: tuple - (errors: list, name_normalized: str | None) donde errors es lista de errores encontrados y name_normalized es el nombre normalizado si es válido, None si no
     """
     errors = []
     name_normalized = None
@@ -58,6 +66,16 @@ def _validate_row_basic(row, row_num):
     return errors, name_normalized
 
 async def handle_upload(upload_file, parametro1: str, parametro2: str, uploaded_by: str = None):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Procesa y valida un archivo CSV o Excel, guardándolo en S3/local y almacenando los datos validados en la base de datos
+    Parámetros de entrada:
+        - upload_file: UploadFile - Archivo CSV o Excel a procesar
+        - parametro1: str - Primer parámetro requerido (nombre de columna 1)
+        - parametro2: str - Segundo parámetro requerido (nombre de columna 2)
+        - uploaded_by: str | None - ID del usuario que subió el archivo (opcional)
+    Retorno esperado: dict - {"file_id": int, "s3_path": str, "rows_saved": int, "validations": list} con el ID del archivo guardado, ruta de almacenamiento, número de filas guardadas y lista de validaciones/errores encontrados
+    """
     contents = await upload_file.read()
     # store original file (S3 or local)
     key = f"uploads/{upload_file.filename}"

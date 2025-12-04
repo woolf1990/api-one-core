@@ -13,6 +13,15 @@ security = HTTPBearer()
 
 
 def require_role(token: str, required_role: str):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Función helper para verificar que un token JWT sea válido y que el usuario tenga el rol requerido
+    Parámetros de entrada:
+        - token: str - Token JWT a verificar
+        - required_role: str - Rol requerido (ej: "uploader")
+    Retorno esperado: dict - Payload del token decodificado con los datos del usuario (sub, rol)
+    Excepciones: HTTPException 401 si el token es inválido o expirado, HTTPException 403 si el usuario no tiene el rol requerido
+    """
     try:
         payload = verify_token(token)
     except TokenError:
@@ -36,11 +45,15 @@ async def upload_file(
     creds: HTTPAuthorizationCredentials = Depends(security),
 ):
     """
-    Endpoint unificado para:
-    - CSV: carga y validación con parámetros adicionales (parametro1, parametro2).
-    - Documentos (PDF/JPG/PNG, etc.): análisis por IA y guardado del resultado.
-
-    La lógica se clasifica automáticamente según el tipo/nombre del archivo.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Endpoint unificado para carga de archivos. Clasifica automáticamente el tipo de archivo: CSV/Excel requiere parametro1 y parametro2 y procesa con validaciones, mientras que PDF/JPG/PNG se analiza con IA Gemini. Registra eventos de auditoría para cada tipo de carga
+    Parámetros de entrada:
+        - file: UploadFile - Archivo a subir (CSV, Excel, PDF, JPG, PNG)
+        - parametro1: str | None - Primer parámetro requerido para CSV/Excel (opcional para documentos)
+        - parametro2: str | None - Segundo parámetro requerido para CSV/Excel (opcional para documentos)
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - Para CSV/Excel: {"file_id": int, "s3_path": str, "rows_saved": int, "validations": list}. Para documentos: {"document_id": int, "analysis_id": int | None, "storage_path": str, "ai_status": str, "ai_error": str | None, "analysis": dict | None}
+    Excepciones: HTTPException 400 si faltan parametro1/parametro2 para CSV/Excel, HTTPException 401/403 si no está autenticado o no tiene rol "uploader"
     """
     payload = require_role(creds.credentials, "uploader")
     user_id = payload.get("sub")
@@ -145,8 +158,13 @@ def get_analysis(
     creds: HTTPAuthorizationCredentials = Depends(security),
 ):
     """
-    Obtiene un análisis de documento por su ID.
-    Requiere autenticación JWT.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Obtiene un análisis de documento por su ID desde la base de datos. Requiere autenticación JWT y rol "uploader"
+    Parámetros de entrada:
+        - analysis_id: int - ID del análisis a obtener (path parameter)
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - Diccionario con el análisis completo (id, document_id, classification, client_name, provider_name, invoice_number, total_amount, products, description, summary, sentiment)
+    Excepciones: HTTPException 404 si el análisis no existe, HTTPException 401/403 si no está autenticado o no tiene rol "uploader"
     """
     payload = require_role(creds.credentials, "uploader")
     
@@ -174,11 +192,14 @@ def update_analysis(
     creds: HTTPAuthorizationCredentials = Depends(security),
 ):
     """
-    Actualiza un análisis de documento existente.
-    Requiere autenticación JWT y rol 'uploader'.
-    
-    Solo se actualizan los campos que se envían en el body.
-    Los campos no enviados se mantienen sin cambios.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Actualiza un análisis de documento existente. Solo actualiza los campos proporcionados en el body (actualización parcial). Requiere autenticación JWT y rol "uploader". Registra evento de auditoría para la actualización
+    Parámetros de entrada:
+        - analysis_id: int - ID del análisis a actualizar (path parameter)
+        - update_data: DocumentAnalysisUpdate - Objeto con los campos a actualizar (classification, client_name, provider_name, invoice_number, total_amount, products, description, summary, sentiment)
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - Diccionario con el análisis actualizado incluyendo todos los campos
+    Excepciones: HTTPException 404 si el análisis no existe, HTTPException 401/403 si no está autenticado o no tiene rol "uploader", HTTPException 500 si ocurre un error al actualizar
     """
     payload = require_role(creds.credentials, "uploader")
     user_id = payload.get("sub")

@@ -14,13 +14,12 @@ async def analyze_and_store_document(
     uploaded_by: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Orquesta el flujo de:
-    - Guardar el archivo (S3 o local).
-    - Intentar análisis con IA.
-    - Guardar en SQL Server:
-        - Documento.
-        - Resultado de análisis (si existe).
-    Si la IA falla, solo se guarda el documento.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Orquesta el flujo completo de análisis de documentos: guarda el archivo en S3/local, intenta análisis con IA Gemini, y guarda el documento y análisis en SQL Server. Si la IA falla, solo guarda el documento con estado "ai_failed"
+    Parámetros de entrada:
+        - upload_file: UploadFile - Archivo a analizar (PDF, JPG, PNG)
+        - uploaded_by: str | None - ID del usuario que subió el archivo (opcional)
+    Retorno esperado: dict - {"document_id": int, "analysis_id": int | None, "storage_path": str, "ai_status": str, "ai_error": str | None, "analysis": dict | None} donde ai_status puede ser "analyzed" o "ai_failed", y analysis contiene los datos extraídos si el análisis fue exitoso
     """
     contents = await upload_file.read()
 

@@ -10,7 +10,14 @@ security = HTTPBearer()
 
 
 def require_authenticated_user(token: str):
-    """Verifica que el token sea válido y retorna el payload."""
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Función helper para verificar que un token JWT sea válido y retornar su payload
+    Parámetros de entrada:
+        - token: str - Token JWT a verificar
+    Retorno esperado: dict - Payload del token decodificado con los datos del usuario (sub, rol, iat, exp, jti)
+    Excepciones: HTTPException 401 si el token es inválido o expirado
+    """
     try:
         payload = verify_token(token)
         return payload
@@ -32,8 +39,18 @@ def get_audit_logs_endpoint(
     creds: HTTPAuthorizationCredentials = Depends(security),
 ):
     """
-    Consulta eventos de auditoría con filtros opcionales.
-    Requiere autenticación JWT.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Endpoint para consultar eventos de auditoría con filtros opcionales y paginación. Requiere autenticación JWT. Valida tipos de evento y parsea fechas en formato ISO o YYYY-MM-DD
+    Parámetros de entrada:
+        - event_type: str | None - Filtrar por tipo de evento (query parameter, opcional)
+        - user_id: str | None - Filtrar por ID de usuario (query parameter, opcional)
+        - start_date: str | None - Fecha de inicio en formato YYYY-MM-DD o YYYY-MM-DDTHH:MM:SS (query parameter, opcional)
+        - end_date: str | None - Fecha de fin en formato YYYY-MM-DD o YYYY-MM-DDTHH:MM:SS (query parameter, opcional)
+        - limit: int - Número máximo de registros a retornar (query parameter, default: 100, rango: 1-1000)
+        - offset: int - Número de registros a saltar para paginación (query parameter, default: 0, mínimo: 0)
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - {"total": int, "limit": int, "offset": int, "logs": list} donde logs es una lista de eventos de auditoría con id, event_type, description, user_id, event_date, metadata
+    Excepciones: HTTPException 400 si el formato de fecha es inválido o el tipo de evento no es válido, HTTPException 401 si no está autenticado, HTTPException 500 si ocurre un error al consultar
     """
     # Verificar autenticación
     payload = require_authenticated_user(creds.credentials)
@@ -107,8 +124,12 @@ def get_audit_logs_endpoint(
 @router.get("/event-types")
 def get_event_types(creds: HTTPAuthorizationCredentials = Depends(security)):
     """
-    Retorna la lista de tipos de eventos disponibles.
-    Requiere autenticación JWT.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Retorna la lista de tipos de eventos de auditoría disponibles. Requiere autenticación JWT
+    Parámetros de entrada:
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - {"event_types": list, "note": str} donde event_types es una lista de objetos con "value" y "label" para cada tipo de evento disponible
+    Excepciones: HTTPException 401 si no está autenticado
     """
     require_authenticated_user(creds.credentials)
     

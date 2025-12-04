@@ -8,6 +8,14 @@ security = HTTPBearer()
 
 @router.post("/refresh")
 def refresh(creds: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Endpoint para refrescar un token JWT. Verifica el token actual y genera uno nuevo con el mismo usuario y rol. Registra eventos de auditoría para refresh exitoso y fallido
+    Parámetros de entrada:
+        - creds: HTTPAuthorizationCredentials - Credenciales HTTP con el token Bearer (inyectado por FastAPI)
+    Retorno esperado: dict - {"access_token": str, "expires_in": int} con el nuevo token JWT y tiempo de expiración en segundos
+    Excepciones: HTTPException 401 si el token es inválido o está expirado
+    """
     token = creds.credentials
     try:
         payload = verify_token(token)

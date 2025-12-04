@@ -11,7 +11,12 @@ from app.utils.logger import logger
 
 
 class EventType:
-    """Tipos de eventos predefinidos."""
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Clase con constantes para tipos de eventos de auditoría predefinidos
+    Parámetros de entrada: None (clase con constantes)
+    Retorno esperado: None (clase con constantes de tipo de evento)
+    """
     DOCUMENT_UPLOAD = "Carga de documento"
     AI_ANALYSIS = "IA"
     USER_INTERACTION = "Interacción del usuario"
@@ -26,13 +31,14 @@ def log_event(
     metadata: Optional[Dict[str, Any]] = None
 ) -> None:
     """
-    Registra un evento de auditoría en la base de datos.
-    
-    Args:
-        event_type: Tipo de evento (usar EventType.*)
-        description: Descripción del evento
-        user_id: ID del usuario que generó el evento (opcional)
-        metadata: Diccionario con información adicional (opcional)
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Registra un evento de auditoría en la base de datos SQL Server
+    Parámetros de entrada:
+        - event_type: str - Tipo de evento (usar EventType.DOCUMENT_UPLOAD, EventType.AI_ANALYSIS, etc.)
+        - description: str - Descripción detallada del evento
+        - user_id: str | None - ID del usuario que generó el evento (opcional)
+        - metadata: dict | None - Diccionario con información adicional del evento (opcional, se serializa a JSON)
+    Retorno esperado: None (función que registra el evento en la BD)
     """
     db = SessionLocal()
     try:
@@ -73,18 +79,16 @@ def get_audit_logs(
     offset: int = 0
 ) -> Dict[str, Any]:
     """
-    Consulta eventos de auditoría con filtros opcionales.
-    
-    Args:
-        event_type: Filtrar por tipo de evento
-        user_id: Filtrar por ID de usuario
-        start_date: Fecha de inicio (inclusive)
-        end_date: Fecha de fin (inclusive)
-        limit: Número máximo de registros a retornar
-        offset: Número de registros a saltar (para paginación)
-    
-    Returns:
-        Dict con 'total' (total de registros) y 'logs' (lista de eventos)
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Consulta eventos de auditoría desde la base de datos con filtros opcionales y paginación
+    Parámetros de entrada:
+        - event_type: str | None - Filtrar por tipo de evento (opcional)
+        - user_id: str | None - Filtrar por ID de usuario (opcional)
+        - start_date: datetime | None - Fecha de inicio para filtrar eventos (inclusive, opcional)
+        - end_date: datetime | None - Fecha de fin para filtrar eventos (inclusive, opcional)
+        - limit: int - Número máximo de registros a retornar (default: 100)
+        - offset: int - Número de registros a saltar para paginación (default: 0)
+    Retorno esperado: dict - {"total": int, "limit": int, "offset": int, "logs": list} donde logs es una lista de diccionarios con los eventos de auditoría (id, event_type, description, user_id, event_date, metadata)
     """
     db = SessionLocal()
     try:

@@ -6,12 +6,22 @@ from app.utils.logger import logger
 
 
 class AIServiceError(Exception):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Excepción personalizada para errores relacionados con el servicio de IA (Gemini)
+    Parámetros de entrada: None (clase de excepción)
+    Retorno esperado: None (clase de excepción)
+    """
     pass
 
 
 def _normalize_analysis_response(parsed: dict) -> dict:
     """
-    Normaliza la respuesta de la IA para asegurar que todos los campos estén presentes.
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Normaliza la respuesta de la IA para asegurar que todos los campos esperados estén presentes, estableciendo valores por defecto (None o []) para campos faltantes
+    Parámetros de entrada:
+        - parsed: dict - Diccionario con la respuesta parseada de la IA (debe contener al menos "classification")
+    Retorno esperado: dict - Diccionario normalizado con todos los campos: classification, client_name, client_address, provider_name, provider_address, invoice_number, invoice_date, total_amount, products, description, summary, sentiment
     """
     classification = parsed.get("classification", "").upper()
     
@@ -54,6 +64,15 @@ def _normalize_analysis_response(parsed: dict) -> dict:
 
 
 def _detect_file_type(content_type: str | None, filename: str) -> str:
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Detecta el tipo de archivo basándose en el content_type y/o la extensión del nombre de archivo
+    Parámetros de entrada:
+        - content_type: str | None - Tipo MIME del archivo (ej: "application/pdf", "image/png")
+        - filename: str - Nombre del archivo con extensión (ej: "documento.pdf", "imagen.png")
+    Retorno esperado: str - Tipo de archivo detectado: "pdf" o "image"
+    Excepciones: AIServiceError si el tipo de archivo no es reconocido
+    """
     filename_lower = filename.lower()
 
     if content_type:
@@ -71,6 +90,12 @@ def _detect_file_type(content_type: str | None, filename: str) -> str:
 
 
 def _build_analysis_prompt() -> str:
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Construye el prompt de análisis para la IA Gemini, especificando el formato JSON esperado para FACTURA e INFORMACION
+    Parámetros de entrada: None
+    Retorno esperado: str - Prompt completo con instrucciones para clasificar y extraer datos del documento
+    """
     return (
         "Analiza el documento. Primero clasifica como FACTURA o INFORMACION.\n\n"
         "Si es FACTURA, responde SOLO este JSON (sin texto adicional, sin markdown):\n"
@@ -110,6 +135,16 @@ def _build_analysis_prompt() -> str:
 
 
 def analyze_document(bytes_data: bytes, filename: str, content_type: str | None = None):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Analiza un documento (PDF, JPG, PNG) usando la API de Gemini para clasificarlo y extraer información estructurada
+    Parámetros de entrada:
+        - bytes_data: bytes - Contenido del archivo en bytes
+        - filename: str - Nombre del archivo (usado para detectar tipo)
+        - content_type: str | None - Tipo MIME del archivo (opcional, usado para detectar tipo)
+    Retorno esperado: dict - Diccionario normalizado con la clasificación y datos extraídos (classification, client_name, provider_name, invoice_number, etc. para FACTURA o description, summary, sentiment para INFORMACION)
+    Excepciones: AIServiceError si GEMINI_API_KEY no está configurado o si ocurre un error al analizar el documento
+    """
     if not settings.GEMINI_API_KEY:
         raise AIServiceError("GEMINI_API_KEY no está configurado")
 

@@ -20,6 +20,15 @@ class TokenResponse(BaseModel):
 
 @router.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
+    """
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Endpoint para autenticación de usuarios. Verifica credenciales y retorna un token JWT de acceso. Registra eventos de auditoría para login exitoso y fallido
+    Parámetros de entrada:
+        - data: LoginRequest - Objeto con username y password
+        - db: Session - Sesión de base de datos (inyectada por FastAPI)
+    Retorno esperado: TokenResponse - {"access_token": str, "token_type": "bearer", "expires_in": int} con el token JWT y tiempo de expiración en segundos
+    Excepciones: HTTPException 401 si las credenciales son inválidas
+    """
     # For demo: check user in DB; otherwise create demo users
     user = crud.get_user_by_username(db, data.username)
     if not user or not crud.verify_password(data.password, user.password_hash):

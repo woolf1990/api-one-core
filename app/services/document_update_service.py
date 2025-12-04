@@ -25,25 +25,24 @@ def update_document_analysis(
     sentiment: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Actualiza un análisis de documento existente.
-    
-    Args:
-        analysis_id: ID del análisis a actualizar
-        classification: Clasificación del documento ("FACTURA" o "INFORMACION")
-        client_name: Nombre del cliente (para facturas)
-        client_address: Dirección del cliente (para facturas)
-        provider_name: Nombre del proveedor (para facturas)
-        provider_address: Dirección del proveedor (para facturas)
-        invoice_number: Número de factura (para facturas)
-        invoice_date: Fecha de factura (para facturas)
-        total_amount: Monto total (para facturas)
-        products: Lista de productos (para facturas)
-        description: Descripción (para información)
-        summary: Resumen (para información)
-        sentiment: Sentimiento ("positivo", "negativo", "neutral") (para información)
-    
-    Returns:
-        Dict con el análisis actualizado
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Actualiza un análisis de documento existente en la base de datos. Solo actualiza los campos proporcionados (actualización parcial)
+    Parámetros de entrada:
+        - analysis_id: int - ID del análisis a actualizar
+        - classification: str | None - Clasificación del documento ("FACTURA" o "INFORMACION", opcional)
+        - client_name: str | None - Nombre del cliente para facturas (opcional)
+        - client_address: str | None - Dirección del cliente para facturas (opcional)
+        - provider_name: str | None - Nombre del proveedor para facturas (opcional)
+        - provider_address: str | None - Dirección del proveedor para facturas (opcional)
+        - invoice_number: str | None - Número de factura (opcional)
+        - invoice_date: str | None - Fecha de factura (opcional)
+        - total_amount: float | None - Monto total de la factura (opcional)
+        - products: list[dict] | None - Lista de productos con name, quantity, unit_price, total (opcional)
+        - description: str | None - Descripción del contenido para documentos informativos (opcional)
+        - summary: str | None - Resumen del contenido (opcional)
+        - sentiment: str | None - Sentimiento ("positivo", "negativo", "neutral") (opcional)
+    Retorno esperado: dict - Diccionario con el análisis actualizado incluyendo todos los campos (id, document_id, classification, client_name, etc., con products parseado desde JSON)
+    Excepciones: ValueError si el análisis no existe
     """
     db = SessionLocal()
     try:
@@ -121,13 +120,11 @@ def update_document_analysis(
 
 def get_document_analysis(analysis_id: int) -> Optional[Dict[str, Any]]:
     """
-    Obtiene un análisis de documento por su ID.
-    
-    Args:
-        analysis_id: ID del análisis
-    
-    Returns:
-        Dict con el análisis o None si no existe
+    Generado por IA - Fecha: 2024-12-19
+    Descripción: Obtiene un análisis de documento por su ID desde la base de datos
+    Parámetros de entrada:
+        - analysis_id: int - ID del análisis a obtener
+    Retorno esperado: dict | None - Diccionario con el análisis completo (id, document_id, classification, client_name, provider_name, invoice_number, total_amount, products, description, summary, sentiment) o None si no existe. El campo products se parsea desde JSON
     """
     db = SessionLocal()
     try:
