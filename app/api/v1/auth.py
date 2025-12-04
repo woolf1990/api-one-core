@@ -5,6 +5,7 @@ from app.core.security import create_access_token
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.db import crud
+from app.services.audit_service import log_event, EventType
 
 router = APIRouter()
 
@@ -22,6 +23,23 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     # For demo: check user in DB; otherwise create demo users
     user = crud.get_user_by_username(db, data.username)
     if not user or not crud.verify_password(data.password, user.password_hash):
+        # Registrar intento de login fallido
+        log_event(
+            event_type=EventType.LOGIN,
+            description=f"Intento de login fallido para usuario: {data.username}",
+            user_id=None,
+            metadata={"username": data.username, "success": False}
+        )
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     access_token = create_access_token(data={"sub": str(user.id), "rol": user.role})
+    
+    # Registrar login exitoso
+    log_event(
+        event_type=EventType.LOGIN,
+        description=f"Login exitoso para usuario: {data.username}",
+        user_id=str(user.id),
+        metadata={"username": data.username, "role": user.role, "success": True}
+    )
+    
     return {"access_token": access_token, "expires_in": 15*60}

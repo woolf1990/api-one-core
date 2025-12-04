@@ -5,6 +5,7 @@ from app.models import file_model
 from app.models import file_validation
 from app.models import data_row
 from app.models import document
+from app.models import audit_log
 
 # create tables if needed
 def init_db(engine):

@@ -13,3 +13,5 @@ pytest
 python-multipart
 google-generativeai
 pillow
+pandas
+openpyxl
