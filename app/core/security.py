@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError, ExpiredSignatureError
+import secrets
 from app.core.config import settings
 
 class TokenError(Exception):
@@ -11,7 +12,12 @@ def create_access_token(data: dict, expires_minutes: int | None = None):
     if expires_minutes is None:
         expires_minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES
     expire = now + timedelta(minutes=expires_minutes)
-    to_encode.update({"exp": int(expire.timestamp())})
+    # Agregar campos estándar JWT para garantizar unicidad
+    to_encode.update({
+        "iat": int(now.timestamp()),  # Timestamp de emisión
+        "exp": int(expire.timestamp()),  # Timestamp de expiración
+        "jti": secrets.token_urlsafe(16)  # JWT ID único para cada token
+    })
     token = jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
     return token
 
